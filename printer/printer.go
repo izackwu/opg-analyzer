@@ -10,5 +10,12 @@ func PrintOPTable(optable *types.OPTable) error {
 }
 
 func PrintGrammar(grammar *types.Grammar) error {
-	return fmt.Errorf("PrintGrammar unimplemented")
+	fmt.Println("The grammar is:")
+	fmt.Println("Terminals:", grammar.Terminals)
+	fmt.Println("Non-terminals:", grammar.NonTerminals)
+	fmt.Println("Productions:")
+	for left, productions := range grammar.Productions {
+		fmt.Println(left, "->", productions)
+	}
+	return nil
 }

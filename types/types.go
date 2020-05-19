@@ -5,10 +5,11 @@ type Token struct {
 	IsTerminal bool
 }
 
+type TokenList []Token
 type Production []Token
 
 type Grammar struct {
-	Terminals, NonTerminals []Token
+	Terminals, NonTerminals TokenList
 	Productions             map[Token][]Production
 }
 
