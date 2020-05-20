@@ -1,5 +1,7 @@
 package types
 
+import "fmt"
+
 func (tl TokenList) Contains(t Token) bool {
 	for _, x := range tl {
 		if x.Name == t.Name {
@@ -34,6 +36,18 @@ func AppendUniqueTokenPairList(tpl TokenPairList, tp TokenPair) (TokenPairList, 
 		return tpl, false
 	}
 	return append(tpl, tp), true
+}
+
+func (opt *OPTable) InsertRelation(leftToken, rightToken Token, precedence Precedence) error {
+	pair := TokenPair{
+		Left:  leftToken,
+		Right: rightToken,
+	}
+	if _, ok := opt.Relations[pair]; ok {
+		return fmt.Errorf("precedence conflicts for %v and %v", leftToken, rightToken)
+	}
+	opt.Relations[pair] = precedence
+	return nil
 }
 
 func (e Precedence) String() string {

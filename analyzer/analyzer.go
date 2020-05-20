@@ -77,13 +77,58 @@ func generateLastVT(grammar *types.Grammar) (map[types.Token]types.TokenList, er
 	return generateVT(grammar, true)
 }
 
+func processProduction(production types.Production, opTable *types.OPTable, firstVT,
+	lastVT map[types.Token]types.TokenList) error {
+	length := len(production)
+	for i, token := range production {
+		if i == length-1 {
+			continue
+		}
+		if token.IsTerminal {
+			for j := i + 1; j < length; j++ {
+				if production[j].IsTerminal {
+					if err := opTable.InsertRelation(token, production[j], types.Equal); err != nil {
+						return err
+					}
+				} else {
+					for _, t := range firstVT[production[j]] {
+						if err := opTable.InsertRelation(token, t, types.Lower); err != nil {
+							return err
+						}
+					}
+				}
+			}
+		} else {
+			for j := i + 1; j < length; j++ {
+				if production[j].IsTerminal {
+					for _, t := range lastVT[token] {
+						if err := opTable.InsertRelation(t, production[j],
+							types.Higher); err != nil {
+							return err
+						}
+					}
+				}
+			}
+		}
+	}
+	return nil
+}
+
 func generateOPTable(grammar *types.Grammar,
 	firstVT, lastVT map[types.Token]types.TokenList) (*types.OPTable, error) {
 	opTable := &types.OPTable{
 		Terminals: grammar.Terminals,
 		Relations: make(map[types.TokenPair]types.Precedence),
 	}
-	return opTable, fmt.Errorf("generateOPTable unimplemented")
+	for _, productions := range grammar.Productions {
+		for _, production := range productions {
+			err := processProduction(production, opTable, firstVT, lastVT)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+	return opTable, nil
 }
 
 func GenerateOPTable(grammar *types.Grammar) (*types.OPTable, error) {
