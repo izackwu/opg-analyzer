@@ -16,7 +16,7 @@ type Grammar struct {
 type Precedence int
 
 const (
-	Lower Precedence = -1
+	Lower Precedence = iota - 1
 	Equal
 	Higher
 )

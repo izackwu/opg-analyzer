@@ -35,3 +35,16 @@ func AppendUniqueTokenPairList(tpl TokenPairList, tp TokenPair) (TokenPairList, 
 	}
 	return append(tpl, tp), true
 }
+
+func (e Precedence) String() string {
+	switch e {
+	case Equal:
+		return "="
+	case Higher:
+		return ">"
+	case Lower:
+		return "<"
+	default:
+		return fmt.Sprintf("%d", int(e))
+	}
+}
