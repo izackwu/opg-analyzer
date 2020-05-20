@@ -61,7 +61,8 @@ func correctTokenType(grammar *types.Grammar) error {
 							" production: %v -> %v ... ", left, production[:j+1])
 					}
 				} else {
-					grammar.Terminals = append(grammar.Terminals, *tokenPointer)
+					// make sure no duplicates are added
+					grammar.Terminals, _ = types.AppendUniqueTokenList(grammar.Terminals, token)
 				}
 			}
 		}
