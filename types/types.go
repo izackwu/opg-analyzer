@@ -25,6 +25,8 @@ type TokenPair struct {
 	Left, Right Token
 }
 
+type TokenPairList []TokenPair
+
 type OPTable struct {
 	Terminals []Token
 	Relations map[TokenPair]Precedence
