@@ -85,6 +85,10 @@ func ReadFromFile(filepath string) (*types.Grammar, error) {
 	}
 	for scanner.Scan() {
 		line := scanner.Text()
+		if lineno == 1 { // add one virtual line to handle '$' gracefully
+			_ = processLine(fmt.Sprintf("OPG_START -> $ %s $", strings.Fields(line)[0]),
+				grammar, 0)
+		}
 		if err := processLine(line, grammar, lineno); err != nil {
 			return nil, err
 		}
