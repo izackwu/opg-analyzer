@@ -27,11 +27,13 @@ func generateVT(grammar *types.Grammar, reverse bool) (map[types.Token]types.Tok
 			} else {
 				//    P -> Q ..., then FirstVT(P) contains FirstVT(Q)
 				// or P -> ... Q, then LastVT(P) contains LastVT(Q)
-				tokenPair := types.TokenPair{
-					Left:  left,
-					Right: production[0],
+				if left != production[firstIdx] {
+					tokenPair := types.TokenPair{
+						Left:  left,
+						Right: production[firstIdx],
+					}
+					containing, _ = types.AppendUniqueTokenPairList(containing, tokenPair)
 				}
-				containing, _ = types.AppendUniqueTokenPairList(containing, tokenPair)
 				//    P -> Q x ..., then x is in FirstVT(P)
 				// or P -> ... x Q, then x is in LastVT(P)
 				if len(production) >= 2 && production[secondIdx].IsTerminal {
@@ -77,7 +79,11 @@ func generateLastVT(grammar *types.Grammar) (map[types.Token]types.TokenList, er
 
 func generateOPTable(grammar *types.Grammar,
 	firstVT, lastVT map[types.Token]types.TokenList) (*types.OPTable, error) {
-	return nil, fmt.Errorf("generateOPTable unimplemented")
+	opTable := &types.OPTable{
+		Terminals: grammar.Terminals,
+		Relations: make(map[types.TokenPair]types.Precedence),
+	}
+	return opTable, fmt.Errorf("generateOPTable unimplemented")
 }
 
 func GenerateOPTable(grammar *types.Grammar) (*types.OPTable, error) {
