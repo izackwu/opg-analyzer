@@ -55,6 +55,11 @@ func correctTokenType(grammar *types.Grammar) error {
 				tokenPointer := &grammar.Productions[left][i][j]
 				if grammar.NonTerminals.Contains(token) {
 					tokenPointer.IsTerminal = false
+					// check whether it's a valid OPG
+					if j != 0 && production[j-1].IsTerminal == false {
+						return fmt.Errorf("invalid grammar: consecutive nonterminals in one"+
+							" production: %v -> %v ... ", left, production[:j+1])
+					}
 				} else {
 					grammar.Terminals = append(grammar.Terminals, *tokenPointer)
 				}
