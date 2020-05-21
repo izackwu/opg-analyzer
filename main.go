@@ -47,4 +47,12 @@ func main() {
 		_, _ = fmt.Fprintln(os.Stderr, "Failed to write OP table to file:\n", err)
 		os.Exit(1)
 	}
+	if len(sentenceFile) != 0 { // there are sentences to parse
+		sentences, err := reader.ReadSentencesFromFile(sentenceFile)
+		if err != nil {
+			_, _ = fmt.Fprintln(os.Stderr, "Failed to load sentences from file:\n", err)
+			os.Exit(1)
+		}
+		_ = analyzer.ParseSentences(opTable, sentences)
+	}
 }
