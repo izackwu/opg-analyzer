@@ -53,6 +53,10 @@ func main() {
 			_, _ = fmt.Fprintln(os.Stderr, "Failed to load sentences from file:\n", err)
 			os.Exit(1)
 		}
-		_ = analyzer.ParseSentences(opTable, sentences)
+		err = analyzer.ParseSentences(opTable, sentences)
+		if err != nil {
+			_, _ = fmt.Fprintln(os.Stderr, "Failed to parse sentences:\n", err)
+			os.Exit(1)
+		}
 	}
 }
