@@ -3,13 +3,15 @@ package printer
 import (
 	"fmt"
 	"github.com/keithnull/opg-analyzer/types"
+	"io"
+	"os"
 	"strings"
 )
 
-func PrintOPTable(opTable *types.OPTable) error {
-	fmt.Println("The OP table is:")
-	fmt.Println("Terminals:", opTable.Terminals)
-	fmt.Println("Relations:")
+func PrintOPTable(opTable *types.OPTable, writer io.Writer) (err error) {
+	_, err = fmt.Fprintln(writer, "The OP table is:")
+	_, err = fmt.Fprintln(writer, "Terminals:", opTable.Terminals)
+	_, err = fmt.Fprintln(writer, "Relations:")
 	maxLength, extraSpace := 0, 3
 	for _, t := range opTable.Terminals {
 		if maxLength < len(t.Name) {
@@ -17,14 +19,14 @@ func PrintOPTable(opTable *types.OPTable) error {
 		}
 	}
 	// print table header
-	fmt.Print(strings.Repeat(" ", maxLength+extraSpace))
+	_, err = fmt.Fprint(writer, strings.Repeat(" ", maxLength+extraSpace))
 	for _, t := range opTable.Terminals {
-		fmt.Print(t.Name, strings.Repeat(" ", maxLength+extraSpace-len(t.Name)))
+		_, err = fmt.Fprint(writer, t.Name, strings.Repeat(" ", maxLength+extraSpace-len(t.Name)))
 	}
-	fmt.Print("\n")
+	_, err = fmt.Fprint(writer, "\n")
 	// print each row
 	for _, t := range opTable.Terminals {
-		fmt.Print(t.Name, strings.Repeat(" ", maxLength+extraSpace-len(t.Name)))
+		_, err = fmt.Fprint(writer, t.Name, strings.Repeat(" ", maxLength+extraSpace-len(t.Name)))
 		for _, t2 := range opTable.Terminals {
 			var s string
 			if p, ok := opTable.Relations[types.TokenPair{t, t2}]; !ok {
@@ -32,20 +34,30 @@ func PrintOPTable(opTable *types.OPTable) error {
 			} else {
 				s = p.String()
 			}
-			fmt.Print(s, strings.Repeat(" ", maxLength+extraSpace-len(s)))
+			_, err = fmt.Fprint(writer, s, strings.Repeat(" ", maxLength+extraSpace-len(s)))
 		}
-		fmt.Print("\n")
+		_, err = fmt.Fprint(writer, "\n")
 	}
-	return nil
+	return
 }
 
-func PrintGrammar(grammar *types.Grammar) error {
-	fmt.Println("The grammar is:")
-	fmt.Println("Terminals:", grammar.Terminals)
-	fmt.Println("Non-terminals:", grammar.NonTerminals)
-	fmt.Println("Productions:")
+func PrintGrammar(grammar *types.Grammar, writer io.Writer) (err error) {
+	_, err = fmt.Fprintln(writer, "The grammar is:")
+	_, err = fmt.Fprintln(writer, "Terminals:", grammar.Terminals)
+	_, err = fmt.Fprintln(writer, "Non-terminals:", grammar.NonTerminals)
+	_, err = fmt.Fprintln(writer, "Productions:")
 	for left, productions := range grammar.Productions {
-		fmt.Println(left, "->", productions)
+		_, err = fmt.Fprintln(writer, left, "->", productions)
 	}
-	return nil
+	return
+}
+
+// create a file and then write OP table to it
+func PrintOPTableToFile(opTable *types.OPTable, filepath string) error {
+	file, err := os.Create(filepath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	return PrintOPTable(opTable, file)
 }

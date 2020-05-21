@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/keithnull/opg-analyzer/types"
+	"io"
 	"os"
 	"strings"
 )
@@ -70,13 +71,8 @@ func correctTokenType(grammar *types.Grammar) error {
 	return nil
 }
 
-func ReadFromFile(filepath string) (*types.Grammar, error) {
-	file, err := os.Open(filepath)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-	scanner := bufio.NewScanner(file)
+func ReadGrammar(reader io.Reader) (*types.Grammar, error) {
+	scanner := bufio.NewScanner(reader)
 	lineno := 1
 	grammar := &types.Grammar{
 		Terminals:    make([]types.Token, 0),
@@ -100,6 +96,12 @@ func ReadFromFile(filepath string) (*types.Grammar, error) {
 	return grammar, nil
 }
 
-func ReadFromText(text string) (*types.Grammar, error) {
-	return nil, fmt.Errorf("ReadFromText unimplemented")
+// Open the grammar file and then pare it
+func ReadGrammarFromFile(grammarFile string) (*types.Grammar, error) {
+	file, err := os.Open(grammarFile)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	return ReadGrammar(file)
 }
