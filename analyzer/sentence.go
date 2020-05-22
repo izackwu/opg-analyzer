@@ -3,6 +3,7 @@ package analyzer
 import (
 	"fmt"
 	"github.com/keithnull/opg-analyzer/types"
+	"strings"
 )
 
 func ParseSentence(opTable *types.OPTable, sentence types.TokenList) error {
@@ -14,9 +15,19 @@ func ParseSentence(opTable *types.OPTable, sentence types.TokenList) error {
 	}
 	analyzeStack[0] = endToken
 	sentence = append(sentence, endToken)
+	formatWidth := len(sentence.String())
+	if formatWidth < 5 {
+		formatWidth = 5
+	}
+	fmt.Printf("Start to parse %v\n", sentence)
+	fmt.Println(strings.Repeat("-", 20+formatWidth*2))
+	defer fmt.Println(strings.Repeat("-", 20+formatWidth*2))
+	fmt.Printf("%v %-*v %*v %v\n", "Iteration", formatWidth, "Stack", formatWidth, "Input",
+		"Action")
 	for inputIdx < len(sentence) {
 		iteration += 1
-		fmt.Printf("Iteration %2d: %v %v ", iteration, analyzeStack, sentence[inputIdx:])
+		fmt.Printf("%-9d %-*v %*v ", iteration, formatWidth,
+			analyzeStack, formatWidth, sentence[inputIdx:])
 		stackTopIdx := len(analyzeStack) - 1
 		for ; !analyzeStack[stackTopIdx].IsTerminal; stackTopIdx-- {
 		}
@@ -26,11 +37,17 @@ func ParseSentence(opTable *types.OPTable, sentence types.TokenList) error {
 			Right: inputToken,
 		}]
 		if !ok {
+			fmt.Println("Error")
 			return fmt.Errorf("invalid sentence: %v", sentence)
 		}
 		switch relation {
 		case types.Lower, types.Equal:
-			fmt.Println("Shift")
+			if len(analyzeStack) == 2 && inputIdx == len(sentence)-1 && !analyzeStack[1].
+				IsTerminal {
+				fmt.Println("Accept")
+			} else {
+				fmt.Println("Shift")
+			}
 			analyzeStack = append(analyzeStack, inputToken)
 			inputIdx += 1
 		case types.Higher:
@@ -54,14 +71,10 @@ func ParseSentence(opTable *types.OPTable, sentence types.TokenList) error {
 				IsTerminal: false,
 			})
 		default:
+			fmt.Println("Error")
 			return fmt.Errorf("invalid terminal relation between %v and %v", stackTopToken, inputToken)
 		}
 	}
-	if len(analyzeStack) != 3 || !(analyzeStack[0] == endToken &&
-		!analyzeStack[1].IsTerminal && analyzeStack[2] == endToken) {
-		return fmt.Errorf("invalid sentence")
-	}
-	fmt.Println("Accept")
 	return nil
 }
 

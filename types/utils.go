@@ -1,6 +1,9 @@
 package types
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 func (tl TokenList) Contains(t Token) bool {
 	for _, x := range tl {
@@ -61,4 +64,20 @@ func (e Precedence) String() string {
 	default:
 		return fmt.Sprintf("%d", int(e))
 	}
+}
+
+func (tl TokenList) String() string {
+	tokenStrings := make([]string, len(tl))
+	for i, t := range tl {
+		tokenStrings[i] = t.Name
+	}
+	return "[" + strings.Join(tokenStrings, " ") + "]"
+}
+
+func (p Production) String() string {
+	return TokenList(p).String()
+}
+
+func (t Token) String() string {
+	return t.Name
 }
