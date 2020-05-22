@@ -1,0 +1,10 @@
+The OP table is:
+Terminals: [( ) i $ + *]
+Relations:
+    (   )   i   $   +   *   
+(   <   =   <       <   <   
+)       >       >   >   >   
+i       >       >   >   >   
+$   <       <   =   <   <   
++   <   >   <   >   >   <   
+*   <   >   <   >   >   >   
